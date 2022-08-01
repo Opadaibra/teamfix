@@ -1,5 +1,7 @@
 //dashboard BODY
+// ignore_for_file: deprecated_member_use
 
+import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_locales/flutter_locales.dart';
 import 'package:get/get.dart';
@@ -13,6 +15,9 @@ class Vicationrequestbody extends StatefulWidget {
 
 // ignore: camel_case_types
 class _vicationrequestbodyState extends State<Vicationrequestbody> {
+  DateTime _dateTime = DateTime.now();
+  DateTime enddate = DateTime.now();
+  var pickeddate;
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -58,6 +63,23 @@ class _vicationrequestbodyState extends State<Vicationrequestbody> {
                   ),
                 ),
                 Verticaldefaultpadding,
+                Text(DateFormat('dd-MM-yyyy').format(_dateTime)),
+                RaisedButton(
+                    child: Text("pickdate"),
+                    onPressed: () {
+                      showDatePicker(
+                              context: context,
+                              initialDate: DateTime.now(),
+                              firstDate: DateTime.now(),
+                              lastDate: DateTime(enddate.year + 1))
+                          .then((value) {
+                        setState(() {
+                          _dateTime = value!;
+                          pickeddate =
+                              DateFormat('dd-MM-yyyy').format(_dateTime);
+                        });
+                      });
+                    })
               ],
             ),
           ),

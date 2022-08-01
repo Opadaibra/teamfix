@@ -3,6 +3,10 @@ import 'package:flutter_locales/flutter_locales.dart';
 import 'package:get/get.dart';
 import 'package:teamfix/constants/constant.dart';
 
+int workerid = 0;
+
+int workershipid = 0;
+
 class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
   MainAppBar({Key? key})
       : preferredSize = Size.fromHeight(Get.height * 0.16),
@@ -27,10 +31,15 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
             width: Get.width * 0.4,
             height: Get.height * 0.04,
             decoration: BoxDecoration(
-                border: Border.all(color: ksecondrycolor),
+                color: kprimarycolor,
+                // border: Border.all(color: ksecondrycolor),
+                boxShadow: [
+                  BoxShadow(
+                      blurRadius: 9, offset: Offset(0, -1), color: kbackground)
+                ],
                 borderRadius: BorderRadius.horizontal(
-                  left: Radius.circular(kdefaultradius),
-                  right: Radius.circular(kdefaultradius),
+                  left: Radius.circular(10),
+                  right: Radius.circular(10),
                 )),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -41,7 +50,7 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
                 ),
                 Padding(padding: EdgeInsets.symmetric(horizontal: 5)),
                 Text(
-                  "10",
+                  "$workershipid",
                   style: Headlinestyle,
                 ),
               ],

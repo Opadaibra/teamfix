@@ -3,15 +3,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_locales/flutter_locales.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:teamfix/Controller/linkapi.dart';
 
 import 'package:teamfix/Controller/Apicaller.dart';
+import 'package:teamfix/Mywidgits/MainAppBar.dart';
 import 'package:teamfix/View/workerdashboard/workerdashboard.dart';
 
 import 'package:teamfix/constants/constant.dart';
 
 bool loginpressed = false;
+int workerid = 0;
 
 class Body extends StatefulWidget {
   @override
@@ -210,6 +213,9 @@ class _BodyState extends State<Body> {
         onPressed: () async {
           await signn();
         },
+        onLongPress: () {
+          Get.off(Workerdashboard());
+        },
       ),
     );
   }
@@ -222,6 +228,7 @@ class _BodyState extends State<Body> {
   }
 
   signn() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
     if (checkfiled()) {
       setState(() {
         loginpressed = true;
@@ -235,6 +242,10 @@ class _BodyState extends State<Body> {
         if (response['message'] == "sucess") {
           setState(() {
             loginpressed = false;
+            workerid = response['WorkerId'];
+            workershipid = response['WorkShop'];
+            preferences.setInt("WorkerId", workerid);
+            preferences.setInt("WorkShop", workershipid);
           });
           Get.off(Workerdashboard());
         } else if (response["message"] == 'Invalid') {
@@ -271,7 +282,7 @@ class _BodyState extends State<Body> {
               Icons.vpn_key,
               color: ksecondrycolor,
             ),
-            focusedBorder: OutlineInputBorder(
+            focusedBorder: OutlineInputBorder( 
               borderSide: new BorderSide(
                 width: 2.0,
                 color: kbackground,

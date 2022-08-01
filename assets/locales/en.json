@@ -50,6 +50,7 @@
     "mainmenu":"Main Menu",
     "cancel":"Cancel",
     "confirm":"Confirm",
-    "id":"TEAM-ID"
+    "id":"TEAM-ID",
+    "meornot":"for me or for other Team"
 
 }

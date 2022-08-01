@@ -27,7 +27,32 @@ class _ShowreqbodyState extends State<Showreqbody> {
             localeText: LocaleText("showreq", style: Headlinestyle)),
         Expanded(
             child: ListView(
-          children: [],
+          children: [
+            for (int i = 0; i < 5; i++)
+              Column(
+                children: [
+                  GestureDetector(
+                    child: Container(
+                      decoration: kboxdecoration,
+                      //    margin: defaultmargin,
+                      padding: EdgeInsets.symmetric(horizontal: 120),
+                      child: Column(
+                        children: [
+                          Verticaldefaultpadding,
+                          Text("data"),
+                          Text("data1"),
+                          Text("data2"),
+                          Text("data3"),
+                          Text("data4"),
+                          Verticaldefaultpadding,
+                        ],
+                      ),
+                    ),
+                    onTap: Get.defaultDialog,
+                  ),
+                ],
+              ),
+          ],
         )),
       ],
     );

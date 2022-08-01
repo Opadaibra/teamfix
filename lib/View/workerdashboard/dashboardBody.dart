@@ -1,7 +1,8 @@
 //Sign BODY
 
 import 'dart:async';
-
+import 'dart:io';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_locales/flutter_locales.dart';
@@ -9,6 +10,8 @@ import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:teamfix/Controller/Apicaller.dart';
+import 'package:teamfix/Mywidgits/MainAppBar.dart';
 import 'package:teamfix/Mywidgits/modifedappbar.dart';
 import 'package:teamfix/constants/Manger.dart';
 import 'package:teamfix/constants/appbar.dart';
@@ -24,6 +27,7 @@ class _DashboardbodyState extends State<Dashboardbody>
     with WidgetsBindingObserver {
   Timer? timer;
   late AppLifecycleState _notification;
+  Apicaller apicaller = new Apicaller();
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
@@ -39,6 +43,7 @@ class _DashboardbodyState extends State<Dashboardbody>
   void initState() {
     super.initState();
     loggedin();
+    getid();
     //getappbar();
     WidgetsBinding.instance.addObserver(this);
     timer = Timer.periodic(
@@ -64,6 +69,18 @@ class _DashboardbodyState extends State<Dashboardbody>
     setState(() {
       locationmessag = "${posation.altitude}, ${posation.longitude}";
     });
+  }
+
+  void getmission() async {
+    final queryParameters = {
+      'param1': 'one',
+      'param2': 'two',
+    };
+    final uri = Uri.https('al-hafez.herokuapp.com', '/api/', queryParameters);
+    final response = await http.get(uri, headers: {
+      HttpHeaders.contentTypeHeader: 'application/json',
+    });
+    print(response);
   }
 
   @override
@@ -119,6 +136,7 @@ class _DashboardbodyState extends State<Dashboardbody>
                         analysis(context, Get.size, "estimatedmission",
                             totalmission.toInt() - donemission.toInt()),
                         Padding(padding: EdgeInsets.symmetric(vertical: 15)),
+                        Text(locationmessag)
                         // taskstate(Get.size, context),
                       ],
                     ),
@@ -132,7 +150,6 @@ class _DashboardbodyState extends State<Dashboardbody>
             //monthleytask(Get.size, context),
             //testlocation(size, context),
             Padding(padding: EdgeInsets.symmetric(vertical: 15)),
-            Text(locationmessag)
           ],
         ),
       ),
@@ -282,6 +299,22 @@ class _DashboardbodyState extends State<Dashboardbody>
             color: ksecondrycolor,
           )),
     );
+  }
+
+  getid() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    if (pref.getInt("WorkerId") != null)
+      workerid = pref.getInt("WorkerId")!;
+    else {
+      print("asdgf");
+    }
+    if (pref.getInt("WorkShop") != null) {
+      workershipid = pref.getInt("WorkShop")!;
+    } else {
+      print("aasdsasdgf");
+    }
+    print("worker id is $workerid");
+    print("workership id is $workershipid");
   }
 
   Padding padding2(Size size, double decrease) =>
