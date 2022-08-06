@@ -21,7 +21,7 @@ class Floatingbutton extends StatelessWidget {
       //  foregroundColor: backgroundcolor.withOpacity(0.25),
       animatedIcon: AnimatedIcons.menu_close,
       foregroundColor: kbackground,
-    
+
       children: [
         SpeedDialChild(
           onTap: () => Get.to(Respite()),
@@ -31,14 +31,14 @@ class Floatingbutton extends StatelessWidget {
           ),
           backgroundColor: ksecondrycolor,
         ),
-        SpeedDialChild(
-          onTap: (() => Get.to(MyyNotification())),
-          child: Icon(
-            Icons.notifications,
-            color: kbackground,
-          ),
-          backgroundColor: ksecondrycolor,
-        ),
+        // SpeedDialChild(
+        //   onTap: (() => Get.to(MyyNotification())),
+        //   child: Icon(
+        //     Icons.notifications,
+        //     color: kbackground,
+        //   ),
+        //   backgroundColor: ksecondrycolor,
+        // ),
         SpeedDialChild(
           //label: "asds",
           labelStyle: TextStyle(),
@@ -49,14 +49,14 @@ class Floatingbutton extends StatelessWidget {
           ),
           backgroundColor: ksecondrycolor,
         ),
-        SpeedDialChild(
-          onTap: (() => Get.to(Maintinanceinquiry())),
-          child: Icon(
-            Icons.monetization_on_sharp,
-            color: kbackground,
-          ),
-          backgroundColor: ksecondrycolor,
-        ),
+        // SpeedDialChild(
+        //   onTap: (() => Get.to(Maintinanceinquiry())),
+        //   child: Icon(
+        //     Icons.monetization_on_sharp,
+        //     color: kbackground,
+        //   ),
+        //   backgroundColor: ksecondrycolor,
+        // ),
         SpeedDialChild(
           onTap: (() => Get.to(warranty())),
           labelStyle: TextStyle(),

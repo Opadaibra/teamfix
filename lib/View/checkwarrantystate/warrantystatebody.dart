@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_locales/flutter_locales.dart';
 import 'package:get/get.dart';
+import 'package:teamfix/Controller/Apicaller.dart';
+import 'package:teamfix/Controller/linkapi.dart';
 import 'package:teamfix/Mywidgits/modifedappbar.dart';
 import 'package:teamfix/constants/Manger.dart';
 import 'package:teamfix/constants/constant.dart';
@@ -23,6 +25,8 @@ class _warrantystatebodyState extends State<warrantystatebody> {
   var _selectedCamera = 1;
   var _autoEnableFlash = false;
   String qr = "";
+  String messsagewarrnty = "";
+  Apicaller apicaller = new Apicaller();
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -57,9 +61,8 @@ class _warrantystatebodyState extends State<warrantystatebody> {
                       //  size: 200,
                       //size: size.width * 0.5,
                     ))),
-            Text(qr),
+            Text(messsagewarrnty),
             //sendbutton(size, context)
-            if (scanResult != null) Text(scanResult!.rawContent.toString()),
           ],
         ),
       ),
@@ -84,11 +87,27 @@ class _warrantystatebodyState extends State<warrantystatebody> {
         ),
       );
       setState(() => scanResult = result);
+      if (scanResult != null) {
+        print(scanResult!.rawContent.toString());
+        var respon = await apicaller.postrequest(
+            checkwarranty, {"syr_num": scanResult!.rawContent.toString()});
+        print(respon);
+        if (respon['message'] == "True") {
+          setState(() {
+            messsagewarrnty = Locales.string(context, "iswarranty");
+          });
+        } else {
+          setState(() {
+            messsagewarrnty = Locales.string(context, "isnotwarranty");
+          });
+        }
+      }
     } on PlatformException catch (e) {
       setState(() {
         scanResult = ScanResult(
           type: ResultType.Error,
           format: BarcodeFormat.qr,
+
           // format: BarcodeFormat.unknown,
           rawContent: e.code == BarcodeScanner.cameraAccessDenied
               ? 'The user did not grant the camera permission!'

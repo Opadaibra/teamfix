@@ -1,6 +1,7 @@
 //Sign BODY
 
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
@@ -25,6 +26,9 @@ class Dashboardbody extends StatefulWidget {
 
 class _DashboardbodyState extends State<Dashboardbody>
     with WidgetsBindingObserver {
+  double totaltask = 10;
+  double finishtask = 7;
+  double estimatedtask = 3;
   Timer? timer;
   late AppLifecycleState _notification;
   Apicaller apicaller = new Apicaller();
@@ -43,7 +47,14 @@ class _DashboardbodyState extends State<Dashboardbody>
   void initState() {
     super.initState();
     loggedin();
-    getid();
+    Future.delayed(Duration(seconds: 4), () {
+      print("now");
+    });
+
+    Future.delayed(Duration(seconds: 4), () {
+      getid();
+    });
+
     //getappbar();
     WidgetsBinding.instance.addObserver(this);
     timer = Timer.periodic(
@@ -66,6 +77,11 @@ class _DashboardbodyState extends State<Dashboardbody>
         .getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
     var lastposation = await Geolocator().getLastKnownPosition();
     print(lastposation);
+    // ignore: unused_element
+    initState() {
+      //   getmission();
+    }
+
     setState(() {
       locationmessag = "${posation.altitude}, ${posation.longitude}";
     });
@@ -73,14 +89,19 @@ class _DashboardbodyState extends State<Dashboardbody>
 
   void getmission() async {
     final queryParameters = {
-      'param1': 'one',
-      'param2': 'two',
+      'workedid': workerid,
     };
     final uri = Uri.https('al-hafez.herokuapp.com', '/api/', queryParameters);
     final response = await http.get(uri, headers: {
       HttpHeaders.contentTypeHeader: 'application/json',
     });
-    print(response);
+    var responebody = jsonDecode(response.body);
+    print(responebody);
+    setState(() {
+      finishtask = responebody['finished'];
+      totaltask = responebody['total'];
+      estimatedtask = totaltask - finishtask;
+    });
   }
 
   @override
@@ -125,16 +146,16 @@ class _DashboardbodyState extends State<Dashboardbody>
                         Padding(padding: EdgeInsets.symmetric(vertical: 15)),
                         // Manger().sizedBox(0, 0.01, context),
                         analysis(context, Get.size, "numoftotalmission",
-                            totalmission.toInt()),
+                            totaltask.toInt()),
                         Padding(padding: EdgeInsets.symmetric(vertical: 15)),
                         //Manger().sizedBox(0, 0.01, context),
                         //divider,
                         analysis(context, Get.size, "accomplishmission",
-                            donemission.toInt()),
+                            finishtask.toInt()),
                         Padding(padding: EdgeInsets.symmetric(vertical: 15)),
                         //Manger().sizedBox(0, 0.01, context),
                         analysis(context, Get.size, "estimatedmission",
-                            totalmission.toInt() - donemission.toInt()),
+                            totaltask.toInt() - finishtask.toInt()),
                         Padding(padding: EdgeInsets.symmetric(vertical: 15)),
                         Text(locationmessag)
                         // taskstate(Get.size, context),
@@ -227,11 +248,11 @@ class _DashboardbodyState extends State<Dashboardbody>
       child: CircularPercentIndicator(
         radius: 150,
         lineWidth: 20,
-        percent: (donemission / totalmission),
+        percent: (finishtask * totaltask / 100),
         progressColor: kprimarycolor,
         backgroundColor: ksecondrycolor,
         circularStrokeCap: CircularStrokeCap.round,
-        center: Text('${donemission / totalmission * 100}%',
+        center: Text('${(finishtask * totaltask / 100) * 100}%',
             style: TextStyle(color: ksecondrycolor, fontSize: 16)),
       ),
     );
@@ -304,12 +325,17 @@ class _DashboardbodyState extends State<Dashboardbody>
   getid() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     if (pref.getInt("WorkerId") != null)
-      workerid = pref.getInt("WorkerId")!;
+      setState(() {
+        workerid = pref.getInt("WorkerId")!;
+      });
     else {
       print("asdgf");
     }
     if (pref.getInt("WorkShop") != null) {
-      workershipid = pref.getInt("WorkShop")!;
+      var shipid = pref.getInt("WorkShop")!;
+      setState(() {
+        workershipid = shipid;
+      });
     } else {
       print("aasdsasdgf");
     }

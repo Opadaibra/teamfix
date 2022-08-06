@@ -13,6 +13,7 @@ import 'package:teamfix/Controller/Apicaller.dart';
 import 'package:teamfix/Controller/linkapi.dart';
 import 'package:teamfix/Mywidgits/modifedappbar.dart';
 import 'package:teamfix/constants/constant.dart';
+import 'package:intl/intl.dart';
 
 class Endamaintenancebody extends StatefulWidget {
   @override
@@ -33,6 +34,7 @@ class _EndamaintenancebodyState extends State<Endamaintenancebody> {
   var _selectedCamera = 1;
   var _autoEnableFlash = false;
   int myid = 0;
+  String kits = '';
   @override
   void initState() {
     // TODO: implement initState
@@ -41,14 +43,17 @@ class _EndamaintenancebodyState extends State<Endamaintenancebody> {
 
   getid() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
-    if (pref.getInt("id") != null) {
-      myid = pref.getInt("id")!;
+    if (pref.getInt("WorkShop") != null) {
+      myid = pref.getInt("WorkShop")!;
+      print(myid);
+    } else {
+      print("asdfsgd");
     }
   }
 
   List _machin = ["refregator", "aircondition", "wachmachin"];
   var _selectedmachin;
-  List<String> option = ["engine", "bilt", "gaz"];
+  List<String> option = [];
   List<String> selectedoption = [];
   Apicaller apicaller = new Apicaller();
   @override
@@ -116,7 +121,8 @@ class _EndamaintenancebodyState extends State<Endamaintenancebody> {
                         onChanged: (Value) {
                           selectedoption = Value;
                           setState(() {
-                            print(Value);
+                            kits = selectedoption.join(",");
+                            print(kits);
                           });
                         })),
 
@@ -136,54 +142,6 @@ class _EndamaintenancebodyState extends State<Endamaintenancebody> {
                         hintStyle: khintstyle,
                         hintText: Locales.string(context, "reqno")),
                     textInputAction: TextInputAction.next,
-                  ),
-                ),
-                Container(
-                  alignment: Alignment.bottomCenter,
-                  width: size.width * 0.9,
-                  child: TextField(
-                    controller: _repaires,
-                    textAlign: TextAlign.start,
-                    minLines: 1,
-                    maxLines: 5,
-                    decoration: InputDecoration(
-                        isDense: true,
-                        prefixIcon: Icon(Icons.home_repair_service_rounded),
-                        hintStyle: khintstyle,
-                        hintText: Locales.string(context, "repair")),
-                    textInputAction: TextInputAction.next,
-                  ),
-                ),
-                Container(
-                  alignment: Alignment.center,
-                  width: size.width * 0.9,
-                  child: TextField(
-                    controller: _totalcost,
-                    textAlign: TextAlign.start,
-                    minLines: 1,
-                    maxLines: 5,
-                    decoration: InputDecoration(
-                        isDense: true,
-                        prefixIcon: Icon(Icons.attach_money_sharp),
-                        hintStyle: khintstyle,
-                        hintText: Locales.string(context, "tocost")),
-                    textInputAction: TextInputAction.next,
-                  ),
-                ),
-                Container(
-                  alignment: Alignment.center,
-                  width: size.width * 0.9,
-                  child: TextField(
-                    controller: _notes,
-                    textAlign: TextAlign.start,
-                    minLines: 1,
-                    maxLines: 5,
-                    decoration: InputDecoration(
-                        isDense: true,
-                        prefixIcon: Icon(Icons.notes),
-                        hintStyle: khintstyle,
-                        hintText: Locales.string(context, "notes")),
-                    textInputAction: TextInputAction.done,
                   ),
                 ),
 
@@ -222,12 +180,18 @@ class _EndamaintenancebodyState extends State<Endamaintenancebody> {
   sendserialnumber() async {
     try {
       var respone = await apicaller.postrequest(
-          sendserial, {"serial": scanResult!.rawContent.toString()});
+          sendserial, {"syr_num": scanResult!.rawContent.toString()});
       print(respone);
-      // option.clear();
-      // for (int i = 0; i < respone.length; i++) {
-      //   option.add(respone[i]["error_type"]);
-      // }
+
+      setState(() {
+        option.clear();
+      });
+      for (int i = 0; i < respone.length; i++) {
+        setState(() {
+          option.add(respone[i]["error_type"]);
+        });
+      }
+      print(option);
     } catch (e) {
       print(" scan qr erroe: $e");
     }
@@ -246,58 +210,42 @@ class _EndamaintenancebodyState extends State<Endamaintenancebody> {
   }
 
   bool checkinput() {
-    if (_requestnumber.text.isEmpty ||
-        _consumingkit.text.isEmpty ||
-        _repaires.text.isEmpty ||
-        _totalcost.text.isEmpty ||
-        _notes.text.isEmpty) {
+    if (_requestnumber.text.isEmpty) {
       return false;
     }
     return true;
   }
 
   finishmaintenance() async {
-    if (checkinput()) {
+    var respone = await apicaller.postrequest(finishlink, {
+      "workshop_id": "$myid",
+      "mission_id": _requestnumber.text,
+      "parts": kits,
+      "date": DateFormat('yyyy-MM-dd').format(DateTime.now()),
+    });
+    print(selectedoption.toString());
+    print(respone);
+    if (respone['message'] == "success") {
+      print("asdfs");
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         backgroundColor: kprimarycolor,
         duration: Duration(seconds: 2),
         content: Text(
           Locales.lang == "en"
-              ? "please fill all field "
-              : "الرجاء ملئ جميع الحقول",
+              ? "Manintenance has been End successfully👍"
+              : "تم إنهاء الصيانة بنجاح 👍",
           style: TextStyle(fontSize: 12),
         ),
       ));
     } else {
-      var respone = await apicaller.postrequest(finishlink, {
-        "id": "$myid",
-        "no": _requestnumber.text,
-        "consumingkit": _consumingkit,
-        "repairs": _repaires,
-        "totalcost": _totalcost,
-        "notes": _notes
-      });
-      if (respone == "sucess") {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: kprimarycolor,
-          duration: Duration(seconds: 2),
-          content: Text(
-            Locales.lang == "en"
-                ? "Manintenance has been End successfully👍"
-                : "تم إنهاء الصيانة بنجاح 👍",
-            style: TextStyle(fontSize: 12),
-          ),
-        ));
-      } else if (respone == "failed") {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: kprimarycolor,
-          duration: Duration(seconds: 2),
-          content: Text(
-            Locales.lang == "en" ? "request denied " : "تم رفض الطلب",
-            style: TextStyle(fontSize: 12),
-          ),
-        ));
-      }
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: kprimarycolor,
+        duration: Duration(seconds: 2),
+        content: Text(
+          Locales.lang == "en" ? "request denied " : "تم رفض الطلب",
+          style: TextStyle(fontSize: 12),
+        ),
+      ));
     }
   }
 
@@ -346,7 +294,6 @@ class _EndamaintenancebodyState extends State<Endamaintenancebody> {
       setState(() {
         scanResult = ScanResult(
           type: ResultType.Error,
-          format: BarcodeFormat.qr,
           // format: BarcodeFormat.unknown,
           rawContent: e.code == BarcodeScanner.cameraAccessDenied
               ? 'The user did not grant the camera permission!'

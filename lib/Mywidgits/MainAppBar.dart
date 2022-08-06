@@ -50,7 +50,7 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
                 ),
                 Padding(padding: EdgeInsets.symmetric(horizontal: 5)),
                 Text(
-                  "$workershipid",
+                  workershipid != 0 ? workershipid.toString() : "غير منتمي",
                   style: Headlinestyle,
                 ),
               ],

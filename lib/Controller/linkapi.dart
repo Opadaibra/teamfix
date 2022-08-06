@@ -2,7 +2,9 @@
 const String Serverlink = "https://al-hafez.herokuapp.com/api";
 const String Loginlink = "$Serverlink/worker/login";
 const String Logoutlink = "$Serverlink/worker/logout";
-const String finishlink = "$Serverlink/worker/";
-const String respitlink = "$Serverlink/notes/add";
+const String finishlink = "$Serverlink/billdetails/add";
+const String respitlink = "$Serverlink/worker/respite";
 const String getmissionlink = "$Serverlink/";
 const String sendserial = "$Serverlink/prices/get_by_keyword";
+const String checkwarranty = "$Serverlink/warranty/check_by_syr_num";
+const String vacationlink = "$Serverlink/vacation/add";

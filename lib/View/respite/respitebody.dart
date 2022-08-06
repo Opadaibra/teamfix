@@ -175,10 +175,9 @@ class _RespitebodyState extends State<Respitebody> {
     } else {
       var respone = await _apicaller.postrequest(respitlink, {
         "worker_id": "$workerid",
-        "workshop_id": "$workershipid",
         "mission_id": "${_requestnumber.text}",
         "note_of_worker": _reason.text,
-        "option": check1value ? "for me" : "for other team",
+        "transfer": check1value ? "for me" : "for other team",
       });
       print("${_requestnumber.text}");
       print(respone);

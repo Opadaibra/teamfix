@@ -210,8 +210,8 @@ class _BodyState extends State<Body> {
                 "sign",
                 style: TextStyle(color: kbackground, fontSize: 14),
               ),
-        onPressed: () async {
-          await signn();
+        onPressed: () {
+          sign();
         },
         onLongPress: () {
           Get.off(Workerdashboard());
@@ -227,8 +227,9 @@ class _BodyState extends State<Body> {
     return true;
   }
 
-  signn() async {
+  sign() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
+    print("asdsa");
     if (checkfiled()) {
       setState(() {
         loginpressed = true;
@@ -243,9 +244,11 @@ class _BodyState extends State<Body> {
           setState(() {
             loginpressed = false;
             workerid = response['WorkerId'];
-            workershipid = response['WorkShop'];
+            try {
+              workershipid = response['WorkShop'];
+              preferences.setInt("WorkShop", workershipid);
+            } catch (e) {}
             preferences.setInt("WorkerId", workerid);
-            preferences.setInt("WorkShop", workershipid);
           });
           Get.off(Workerdashboard());
         } else if (response["message"] == 'Invalid') {
@@ -282,7 +285,7 @@ class _BodyState extends State<Body> {
               Icons.vpn_key,
               color: ksecondrycolor,
             ),
-            focusedBorder: OutlineInputBorder( 
+            focusedBorder: OutlineInputBorder(
               borderSide: new BorderSide(
                 width: 2.0,
                 color: kbackground,

@@ -51,6 +51,8 @@
     "cancel":"Cancel",
     "confirm":"Confirm",
     "id":"TEAM-ID",
-    "meornot":"for me or for other Team"
+    "meornot":"for me or for other Team",
+    "iswarranty":"Device is warranted",
+    "isnotwarranty":"Device isn't warranted"
 
 }

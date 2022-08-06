@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_locales/flutter_locales.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:teamfix/Controller/Apicaller.dart';
+import 'package:teamfix/Controller/linkapi.dart';
+import 'package:teamfix/Mywidgits/MainAppBar.dart';
 import 'package:teamfix/View/Endmaintenance/Endamaintenance.dart';
 import 'package:teamfix/Settings/Settings.dart';
 import 'package:teamfix/View/LogIn/LoginPage.dart';
@@ -23,6 +27,7 @@ class Workerdrawer extends StatefulWidget {
 }
 
 class WorkerdrawerState extends State<Workerdrawer> {
+  Apicaller apicaller = new Apicaller();
   final TextEditingController _logoutcontroller = new TextEditingController();
   String errormessage = "";
 
@@ -223,27 +228,30 @@ class WorkerdrawerState extends State<Workerdrawer> {
         color: kbackground,
       ),
       onTap: () {
+        getid();
+        print("ASdfhgmjkjgf");
+
         //  Scaffold.of(context).closeDrawer();
         Get.defaultDialog(
           content: Column(
             children: [
               Text(errormessage),
-              Container(
-                alignment: Alignment.center,
-                //    width: size.width * 0.9,
-                child: TextField(
-                  textAlign: TextAlign.start,
-                  minLines: 1,
-                  maxLines: 5,
-                  controller: _logoutcontroller,
-                  decoration: InputDecoration(
-                      isDense: true,
-                      prefixIcon: Icon(Icons.notes),
-                      hintStyle: TextStyle(color: Colors.grey, fontSize: 14),
-                      hintText: Locales.string(context, "exit")),
-                  textInputAction: TextInputAction.done,
-                ),
-              ),
+              // Container(
+              //   alignment: Alignment.center,
+              //   //    width: size.width * 0.9,
+              //   child: TextField(
+              //     textAlign: TextAlign.start,
+              //     minLines: 1,
+              //     maxLines: 5,
+              //     controller: _logoutcontroller,
+              //     decoration: InputDecoration(
+              //         isDense: true,
+              //         prefixIcon: Icon(Icons.notes),
+              //         hintStyle: TextStyle(color: Colors.grey, fontSize: 14),
+              //         hintText: Locales.string(context, "exit")),
+              //     textInputAction: TextInputAction.done,
+              //   ),
+              // ),
             ],
           ),
           cancel: InkWell(
@@ -253,15 +261,9 @@ class WorkerdrawerState extends State<Workerdrawer> {
               style: dialogbuttonstyle,
             ),
           ),
-          confirm: ElevatedButton(
-            onPressed: () {
-              if (_logoutcontroller.text.isEmpty) {
-                setState(() {
-                  errormessage = "Please fill cause field first ";
-                });
-              } else {
-                Get.off(LoginPage());
-              }
+          confirm: InkWell(
+            onTap: () {
+              logoutfunc();
             },
             child: LocaleText(
               "confirm",
@@ -275,6 +277,23 @@ class WorkerdrawerState extends State<Workerdrawer> {
     );
   }
 
+  logoutfunc() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+
+    var respon = await apicaller.postrequest(Logoutlink, {"id": "$workerid"});
+    print(respon);
+    if (respon['message'] == "Success") {
+      pref.setBool("loggedin", false);
+      pref.setInt("WorkerId", 0);
+      pref.setInt("WorkShop", 0);
+      Get.off(LoginPage());
+    } else {
+      setState(() {
+        errormessage = "wrong";
+      });
+    }
+  }
+
   UserAccountsDrawerHeader useraccountheader(BuildContext context) {
     return UserAccountsDrawerHeader(
       //currentAccountPictureSize: size * 0.18,
@@ -286,5 +305,23 @@ class WorkerdrawerState extends State<Workerdrawer> {
       accountEmail: Text("Opadaibra@gmail.com",
           textAlign: TextAlign.left, style: draweritemstyle),
     );
+  }
+
+  getid() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    if (pref.getInt("WorkerId") != null)
+      workerid = pref.getInt("WorkerId")!;
+    else {
+      print("asdgf");
+    }
+    if (pref.getInt("WorkShop") != null) {
+      setState(() {
+        workershipid = pref.getInt("WorkShop")!;
+      });
+    } else {
+      print("aasdsasdgf");
+    }
+    print("worker id is $workerid");
+    print("workership id is $workershipid");
   }
 }
