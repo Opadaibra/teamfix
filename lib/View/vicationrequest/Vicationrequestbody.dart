@@ -1,6 +1,8 @@
 //dashboard BODY
 // ignore_for_file: deprecated_member_use
 
+import 'dart:async';
+
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_locales/flutter_locales.dart';
@@ -20,9 +22,18 @@ class Vicationrequestbody extends StatefulWidget {
 class _vicationrequestbodyState extends State<Vicationrequestbody> {
   DateTime _dateTime = DateTime.now();
   DateTime enddate = DateTime.now();
+  Timer? timer;
   final TextEditingController reason = new TextEditingController();
   var pickeddate;
   Apicaller apicaller = new Apicaller();
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    timer =
+        Timer.periodic(Duration(minutes: 1), (Timer t) => checkvacationstate());
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -38,6 +49,35 @@ class _vicationrequestbodyState extends State<Vicationrequestbody> {
         body(context),
       ],
     );
+  }
+
+  bool viewstatues1 = false;
+  bool rejectedstatues = false;
+  bool aceepte = false;
+
+  checkvacationstate() async {
+    var respne = await apicaller
+        .postrequest(vacationstatekink, {"worker_id": "$workerid"});
+    print(respne);
+    if (respne['status'] == "waiting") {
+      setState(() {
+        viewstatues1 = true;
+      });
+    }
+    if (respne['status'] == "no") {
+      setState(() {
+        rejectedstatues = true;
+        viewstatues1 = false;
+        aceepte = false;
+      });
+    }
+    if (respne['status'] == "yes") {
+      setState(() {
+        rejectedstatues = false;
+        viewstatues1 = false;
+        aceepte = true;
+      });
+    }
   }
 
   Expanded body(BuildContext context) {
@@ -117,7 +157,37 @@ class _vicationrequestbodyState extends State<Vicationrequestbody> {
             ),
           ),
           Verticaldefaultpadding,
-          sendbutton(Get.size, context)
+          sendbutton(Get.size, context),
+          if (viewstatues1)
+            Container(
+                height: Get.height * 0.1,
+                decoration: kboxdecoration,
+                padding: EdgeInsets.symmetric(vertical: 30),
+                margin: EdgeInsets.symmetric(horizontal: Get.width * 0.1),
+                child: Text(
+                  "طلب الإجازة الأخير قيد الانتظار",
+                  textAlign: TextAlign.center,
+                )),
+          if (rejectedstatues)
+            Container(
+                height: Get.height * 0.1,
+                decoration: kboxdecoration,
+                padding: EdgeInsets.symmetric(vertical: 30),
+                margin: EdgeInsets.symmetric(horizontal: Get.width * 0.1),
+                child: Text(
+                  "تم رفض طلب الإجازة",
+                  textAlign: TextAlign.center,
+                )),
+          if (aceepte)
+            Container(
+                height: Get.height * 0.1,
+                decoration: kboxdecoration,
+                padding: EdgeInsets.symmetric(vertical: 30),
+                margin: EdgeInsets.symmetric(horizontal: Get.width * 0.1),
+                child: Text(
+                  "تم قبول الطلب",
+                  textAlign: TextAlign.center,
+                )),
         ],
       ),
     );
@@ -135,9 +205,9 @@ class _vicationrequestbodyState extends State<Vicationrequestbody> {
         onPressed: takevacation,
       ),
     );
-   }
+  }
   // requeststate() async {
-  //   var respone = await 
+  //   var respone = await
   // }
 
   takevacation() async {
@@ -152,8 +222,8 @@ class _vicationrequestbodyState extends State<Vicationrequestbody> {
           duration: Duration(seconds: 2),
           content: Text(
             Locales.lang == "en"
-                ? "request has been approvin"
-                : "تم قبول الطلب بنجاح 👍",
+                ? "request has been send"
+                : "تم إرسال الطلب بنجاح 👍",
             style: TextStyle(fontSize: 12),
           ),
         ));

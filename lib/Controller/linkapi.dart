@@ -8,3 +8,5 @@ const String getmissionlink = "$Serverlink/";
 const String sendserial = "$Serverlink/prices/get_by_keyword";
 const String checkwarranty = "$Serverlink/warranty/check_by_syr_num";
 const String vacationlink = "$Serverlink/vacation/add";
+const String locationkink = "$Serverlink/Maintenanceworkshop/add_position";
+const String vacationstatekink = "$Serverlink/vacation/get_latest";

@@ -12,6 +12,7 @@ import 'package:get/get.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:teamfix/Controller/Apicaller.dart';
+import 'package:teamfix/Controller/linkapi.dart';
 import 'package:teamfix/Mywidgits/MainAppBar.dart';
 import 'package:teamfix/Mywidgits/modifedappbar.dart';
 import 'package:teamfix/constants/Manger.dart';
@@ -30,6 +31,7 @@ class _DashboardbodyState extends State<Dashboardbody>
   double finishtask = 7;
   double estimatedtask = 3;
   Timer? timer;
+  String openlocationmessge = "";
   late AppLifecycleState _notification;
   Apicaller apicaller = new Apicaller();
   @override
@@ -68,6 +70,8 @@ class _DashboardbodyState extends State<Dashboardbody>
     super.dispose();
   }
 
+  String altitude = "";
+  String longtiud = "";
   double totalmission = 10;
   late double restmission;
   double donemission = 5;
@@ -84,7 +88,22 @@ class _DashboardbodyState extends State<Dashboardbody>
 
     setState(() {
       locationmessag = "${posation.altitude}, ${posation.longitude}";
+      altitude = "${posation.altitude}";
+      longtiud = "${posation.longitude}";
     });
+    sendlocation(altitude, longtiud);
+  }
+
+  sendlocation(String x, String y) async {
+    var respone = await apicaller.postrequest(locationkink, {"x": x, "y": y});
+    print(respone);
+    try {
+      if (respone['message'] == "success") {}
+    } catch (e) {
+      setState(() {
+        openlocationmessge = "Please open location";
+      });
+    }
   }
 
   void getmission() async {
@@ -124,6 +143,7 @@ class _DashboardbodyState extends State<Dashboardbody>
                 ),
                 localeText: LocaleText("mainmenu", style: Headlinestyle)),
             Padding(padding: EdgeInsets.symmetric(vertical: 15)),
+            Text(openlocationmessge),
             // percentageheadline(Get.size, context),
             Container(
                 width: Get.width,
@@ -172,22 +192,6 @@ class _DashboardbodyState extends State<Dashboardbody>
             //testlocation(size, context),
             Padding(padding: EdgeInsets.symmetric(vertical: 15)),
           ],
-        ),
-      ),
-    );
-  }
-
-  Container testlocation(Size size, BuildContext context) {
-    return Container(
-      // ignore: deprecated_member_use
-      child: FlatButton(
-        onPressed: () {
-          getcurrentlocation();
-        },
-        color: Colors.blue[800],
-        child: Text(
-          "getlocation",
-          style: TextStyle(color: Colors.white),
         ),
       ),
     );
